@@ -32,7 +32,7 @@ class MainActivity : FlutterActivity() {
     private var handler: Handler = Handler()  
     private var pause:Boolean = false
     private var done:Boolean = false
-    private var answer:String = ""
+    private var answer:Boolean = false
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -73,32 +73,32 @@ class MainActivity : FlutterActivity() {
 
     }
     
-    private fun checkPermission(): String{
+    private fun checkPermission(): Boolean{
         val permission = mutableListOf<String>()
         permission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {   
-            answer = "PERMISSION_GRANTED"         
+            answer = true         
         }
         else if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {   
-            answer = "PERMISSION_DENIED"         
+            answer = false         
         }
         else{
             ActivityCompat.requestPermissions(this, permission.toTypedArray(), 8)
-            answer = "PERMISSION_JUST_GRANTED"
+            answer = true
         }
         return answer
     }
     
-    private fun requestPermission(): String{
+    private fun requestPermission(): Boolean{
         val permission = mutableListOf<String>()
         permission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         ActivityCompat.requestPermissions(this, permission.toTypedArray(), 8)
         if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {   
-            answer = "PERMISSION_GRANTED"         
+            answer = true        
         }
         else{
-            answer = "PERMISSION_STILL_DENIED"
+            answer = false
         }
         return answer
     }

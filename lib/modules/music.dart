@@ -36,34 +36,22 @@ class Musics {
       );
 }
 
-Future<String> permission() async {
-  String answer = "yes";
+Future<bool> permission() async {
+  bool answer = true;
   await platform.invokeMethod("checkPermission").then(
-    (v) async {
-      if (v == "PERMISSIONS_GRANTED") {
-        answer = "yes";
-      } else if (v != "PERMISSIONS_GRANTED") {
+    (permit) async {
+      if (permit == true) {
+        answer = true;
+      } else {
         await platform.invokeMethod("requestPermission").then(
           (value) {
-            if (value == "PERMISSIONS_GRANTED") {
-              answer = "yes";
+            if (value == true) {
+              answer = true;
             } else {
-              answer = "no";
+              answer = false;
             }
           },
         );
-      } else if (v == "PERMISSIONS_DENIED") {
-        await platform.invokeMethod("requestPermission").then(
-          (value) {
-            if (value == "PERMISSIONS_GRANTED") {
-              answer = "yes";
-            } else {
-              answer = "no";
-            }
-          },
-        );
-      } else if (v == "PERMISSION_DENIED_PERMANENTLY") {
-        answer = "no";
       }
     },
   );
@@ -75,29 +63,29 @@ Future<List<Musics>> getOfflineMusics() async {
   List<Musics> musics = [];
   await permission().then(
     (value) async {
-      //if (value == "yes") {
-      await platform.invokeMethod('getAllAudioFiles').then(
-        (value) {
-          var result = value;
-          for (int i = 0; i < result.length; i++) {
-            result[i] = result[i].replaceAll("{", "{\"");
-            result[i] = result[i].replaceAll("}", "\"}");
-            result[i] = result[i].replaceAll("=", "\" : \"");
-            result[i] = result[i].replaceAll("_,", "_");
-            result[i] = result[i].replaceAll(",_", "_");
-            result[i] = result[i].replaceAll("-,", "-");
-            result[i] = result[i].replaceAll(",-", "-");
-            result[i] = result[i].replaceAll(", ", "\" , \"");
-            result[i] = result[i].replaceAll("\" ", "\"");
-          }
-          for (int i = 0; i < result.length; i++) {
-            var ms = json.decode(result[i]);
-            var mus = Musics.fromMap(ms);
-            musics.add(mus);
-          }
-        },
-      );
-      //}
+      if (value) {
+        await platform.invokeMethod('getAllAudioFiles').then(
+          (value) {
+            var result = value;
+            for (int i = 0; i < result.length; i++) {
+              result[i] = result[i].replaceAll("{", "{\"");
+              result[i] = result[i].replaceAll("}", "\"}");
+              result[i] = result[i].replaceAll("=", "\" : \"");
+              result[i] = result[i].replaceAll("_,", "_");
+              result[i] = result[i].replaceAll(",_", "_");
+              result[i] = result[i].replaceAll("-,", "-");
+              result[i] = result[i].replaceAll(",-", "-");
+              result[i] = result[i].replaceAll(", ", "\" , \"");
+              result[i] = result[i].replaceAll("\" ", "\"");
+            }
+            for (int i = 0; i < result.length; i++) {
+              var ms = json.decode(result[i]);
+              var mus = Musics.fromMap(ms);
+              musics.add(mus);
+            }
+          },
+        );
+      }
     },
   );
 
@@ -108,16 +96,16 @@ Future<List> getOfflineAudioAlbums() async {
   List albums = [];
   await permission().then(
     (value) async {
-      //if (value == "yes") {
-      await platform.invokeMethod('getAudioAlbums').then(
-        (value) {
-          var album = value.toSet().toList();
-          for (int i = 0; i < album.length; i++) {
-            albums.add(album[i]);
-          }
-        },
-      );
-      //}
+      if (value) {
+        await platform.invokeMethod('getAudioAlbums').then(
+          (value) {
+            var album = value.toSet().toList();
+            for (int i = 0; i < album.length; i++) {
+              albums.add(album[i]);
+            }
+          },
+        );
+      }
     },
   );
 
@@ -131,26 +119,5 @@ Future<List> getOnlineAudioAlbums() async {
 
 Future<List<Musics>> getOnlineMusics() async {
   List<Musics> musics = [];
-  await platform.invokeMethod('getAllAudioFiles').then(
-    (value) {
-      var result = value;
-      for (int i = 0; i < result.length; i++) {
-        result[i] = result[i].replaceAll("{", "{\"");
-        result[i] = result[i].replaceAll("}", "\"}");
-        result[i] = result[i].replaceAll("=", "\" : \"");
-        result[i] = result[i].replaceAll("_,", "_");
-        result[i] = result[i].replaceAll(",_", "_");
-        result[i] = result[i].replaceAll("-,", "-");
-        result[i] = result[i].replaceAll(",-", "-");
-        result[i] = result[i].replaceAll(", ", "\" , \"");
-        result[i] = result[i].replaceAll("\" ", "\"");
-      }
-      for (int i = 0; i < result.length; i++) {
-        var ms = json.decode(result[i]);
-        var mus = Musics.fromMap(ms);
-        musics.add(mus);
-      }
-    },
-  );
   return musics;
 }
